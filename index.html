@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DNY Sport — Gợi ý size v4.3 (Chấm điểm mềm)</title>
+<style>
+:root{--bg:#0b1f3a;--pri:#1594c8;--acc:#8fd5ef;--ink:#0f172a;}
+*{box-sizing:border-box}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:#f6fbff;color:var(--ink)}
+header{background:linear-gradient(120deg,var(--bg),#124e7a);color:#fff;padding:22px 16px;text-align:center}
+header h1{margin:0;font-size:clamp(20px,3.5vw,30px)}
+header p{margin:6px 0 0;opacity:.9}
+main{max-width:1140px;margin:18px auto;padding:0 14px 28px;display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:1024px){main{grid-template-columns:1.15fr .85fr}}
+.card{background:#fff;border-radius:16px;box-shadow:0 10px 28px rgba(2,48,71,.08);padding:16px;border:1px solid #e3eef7}
+label{font-weight:650;font-size:14px;display:block;margin:10px 0 6px}
+input,select{width:100%;padding:12px 14px;border:1px solid #d7e7f2;border-radius:12px;font-size:16px;outline:none}
+input:focus,select:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(21,148,200,.15)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 16px;border-radius:12px;border:0;cursor:pointer;font-weight:800;font-size:15px}
+.btn-primary{background:var(--pri);color:#fff}
+.btn-ghost{background:#eef7fc;color:#06324b}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#ecfeff;color:#06324b;font-weight:800;border:1px solid #c7f2ff}
+.result{border:2px dashed var(--acc);border-radius:14px;padding:16px;background:#f0fbff;margin-top:14px}
+.size-badge{display:inline-flex;align-items:center;justify-content:center;min-width:52px;height:52px;border-radius:14px;background:var(--bg);color:#fff;font-weight:900;font-size:20px;padding:0 10px}
+.hint{font-size:13px;color:#0b3954;margin-top:6px}
+.error{color:#b91c1c;font-weight:800;margin-top:8px}
+table{width:100%;border-collapse:collapse;margin-top:8px;font-size:14px}
+th,td{text-align:center;padding:10px 8px;border-bottom:1px solid #eef2f7}
+th{background:#f5fbff}
+.subtitle{color:#0b3954;font-weight:800;margin:8px 0 0}
+.flex{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.note{background:#fff8e1;border:1px solid #fde68a;color:#8a6d00;border-radius:10px;padding:8px 10px;font-size:13px;margin-top:8px}
+tr.pick { background:#e7f5ff !important; }
+tr.heightRow { background:#fef9c3 !important; }
+td.lenCell b.diff { display:inline-block; margin-left:6px; font-weight:800; color:#b45309; }
+td.lenCell small.new { display:block; color:#0b3b59; }
+.hidden{display:none}
+.adjPill{display:inline-flex;align-items:center;margin-left:8px;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:800;border:1px dashed #0ea5b0;background:#e6fffb;color:#0f766e}
+.score{font-size:12px;color:#475569;margin-left:6px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Gợi ý size — Chấm điểm mềm</h1>
+  <p>Chọn size bằng điểm số mượt (tránh “kẹt biên” khi khoảng chồng chéo). Vẫn áp dụng quy tắc cắt/tăng lai.</p>
+</header>
+
+<main>
+  <section class="card" id="app">
+    <form onsubmit="event.preventDefault(); suggestSize();">
+      <div class="row">
+        <div>
+          <label for="height">Chiều cao (cm)</label>
+          <input id="height" inputmode="decimal" placeholder="VD: 170" autocomplete="off">
+        </div>
+        <div>
+          <label for="weight">Cân nặng (kg)</label>
+          <input id="weight" inputmode="decimal" placeholder="VD: 65" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <div>
+          <label for="sport">Môn thể thao</label>
+          <select id="sport">
+            <option value="football" selected>Bóng đá</option>
+            <option value="volleyball">Bóng chuyền</option>
+            <option value="basketball">Bóng rổ</option>
+            <option value="baseball">Bóng chày</option>
+            <option value="rugby">Bóng bầu dục</option>
+            <option value="badminton">Cầu lông</option>
+            <option value="pickleball">Pickleball</option>
+            <option value="cycling">Xe đạp</option>
+            <option value="running">Chạy bộ</option>
+            <option value="training">Gym/Training</option>
+          </select>
+        </div>
+        <div>
+          <label for="gender">Đối tượng</label>
+          <select id="gender" onchange="toggleTables()">
+            <option value="male" selected>Nam</option>
+            <option value="female">Nữ</option>
+            <option value="kids">Trẻ em</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex" style="margin-top:14px">
+        <button class="btn btn-primary" type="submit">Gợi ý ngay</button>
+        <button class="btn btn-ghost" type="button" onclick="clearAll()">Xoá</button>
+        <span id="adultSizes" class="pill">XS • S • M • L • XL • XXL • 3XL • 4XL • 5XL • 6XL • 7XL</span>
+        <span id="kidSizes" class="pill hidden">1 • 3 • 5 • 7 • 9 • 11 • 13</span>
+      </div>
+      <div id="err" class="error" style="display:none"></div>
+      <div id="kidNote" class="note hidden">Trẻ em: phần mềm chỉ gợi ý size theo cân nặng; lựa chọn môn thể thao hiển thị nhưng không ảnh hưởng kết quả.</div>
+    </form>
+
+    <div id="result" class="result" style="display:none"></div>
+  </section>
+
+  <aside class="card">
+    <div id="maleTblWrap">
+      <div class="subtitle">Bảng tham chiếu <b>Nam</b></div>
+      <table aria-label="Bảng size Nam">
+        <thead><tr><th>Size</th><th>Kg</th><th>cm</th><th>Dài áo</th><th>Ngang ngực</th><th>Dài tay</th></tr></thead>
+        <tbody id="tableBodyMale"></tbody>
+      </table>
+    </div>
+
+    <div id="femaleTblWrap" class="hidden">
+      <div class="subtitle">Bảng tham chiếu <b>Nữ</b></div>
+      <table aria-label="Bảng size Nữ">
+        <thead><tr><th>Size</th><th>Kg</th><th>cm</th><th>Dài áo</th><th>Ngang ngực</th><th>Ngang eo</th><th>Dài tay</th></tr></thead>
+        <tbody id="tableBodyFemale"></tbody>
+      </table>
+    </div>
+
+    <div id="kidTblWrap" class="hidden">
+      <div class="subtitle">Bảng tham chiếu <b>Trẻ em</b></div>
+      <table aria-label="Bảng size Trẻ em">
+        <thead><tr><th>Size</th><th>Kg</th><th>Tuổi</th><th>Dài áo</th><th>Ngang ngực</th><th>Dài tay</th></tr></thead>
+        <tbody id="tableBodyKid"></tbody>
+      </table>
+    </div>
+    <p class="hint">Dòng được chọn sẽ highlight; cột <b>Dài áo</b> hiển thị “→ ... (cắt/tăng ...)” khi có điều chỉnh.</p>
+  </aside>
+</main>
+
+<script>
+const MALE=[
+  {code:"XS",w:[45,50],h:[140,150],len:58,chest:44,sleeve:20},
+  {code:"S",w:[50,55],h:[145,155],len:61,chest:46,sleeve:21},
+  {code:"M",w:[55,60],h:[155,160],len:64,chest:48,sleeve:22},
+  {code:"L",w:[60,70],h:[160,170],len:67,chest:50,sleeve:23},
+  {code:"XL",w:[70,80],h:[170,180],len:70,chest:52,sleeve:24},
+  {code:"XXL",w:[80,90],h:[180,190],len:72,chest:54,sleeve:25},
+  {code:"3XL",w:[90,100],h:[185,195],len:73,chest:56,sleeve:26},
+  {code:"4XL",w:[100,110],h:[190,200],len:74,chest:58,sleeve:27},
+  {code:"5XL",w:[110,120],h:[195,205],len:75.5,chest:60,sleeve:27},
+  {code:"6XL",w:[120,130],h:[200,210],len:77,chest:62,sleeve:27},
+  {code:"7XL",w:[130,140],h:[205,215],len:77.5,chest:64,sleeve:27},
+];
+const FEMALE=[
+  {code:"XS",w:[45,55],h:[135,145],len:52,chest:42,waist:39,sleeve:15},
+  {code:"S",w:[50,55],h:[145,155],len:55.5,chest:44,waist:41,sleeve:16},
+  {code:"M",w:[55,60],h:[155,160],len:59,chest:46,waist:43,sleeve:17},
+  {code:"L",w:[60,70],h:[160,170],len:62,chest:48,waist:45,sleeve:18},
+  {code:"XL",w:[70,80],h:[170,180],len:65,chest:50,waist:47,sleeve:19},
+  {code:"XXL",w:[80,90],h:[180,190],len:68,chest:52,waist:49,sleeve:20},
+  {code:"3XL",w:[90,100],h:[185,195],len:71,chest:54,waist:51,sleeve:21},
+  {code:"4XL",w:[100,110],h:[190,200],len:74,chest:56,waist:53,sleeve:22},
+  {code:"5XL",w:[110,120],h:[195,205],len:77,chest:58,waist:55,sleeve:23},
+  {code:"6XL",w:[120,130],h:[200,210],len:80,chest:60,waist:57,sleeve:24},
+];
+const KIDS=[
+  {code:"1",w:[10,15],age:"1–2",len:42,chest:32,sleeve:12},
+  {code:"3",w:[15,20],age:"3–4",len:44,chest:34,sleeve:13},
+  {code:"5",w:[20,25],age:"5–6",len:46.5,chest:36,sleeve:14},
+  {code:"7",w:[25,30],age:"7–8",len:45.5,chest:38,sleeve:15},
+  {code:"9",w:[30,35],age:"9–10",len:52,chest:40,sleeve:16},
+  {code:"11",w:[35,40],age:"11–12",len:55,chest:42,sleeve:17},
+  {code:"13",w:[40,45],age:"13–14",len:58,chest:44,sleeve:18},
+];
+
+const $=id=>document.getElementById(id);
+function renderMale(){ $("tableBodyMale").innerHTML = MALE.map(r=>`<tr><td><b>${r.code}</b></td><td>${r.w[0]}–${r.w[1]}</td><td>${r.h[0]}–${r.h[1]}</td><td class="lenCell" data-len="${r.len}">${r.len}</td><td>${r.chest}</td><td>${r.sleeve}</td></tr>`).join(""); }
+function renderFemale(){ $("tableBodyFemale").innerHTML = FEMALE.map(r=>`<tr><td><b>${r.code}</b></td><td>${r.w[0]}–${r.w[1]}</td><td>${r.h[0]}–${r.h[1]}</td><td class="lenCell" data-len="${r.len}">${r.len}</td><td>${r.chest}</td><td>${r.waist}</td><td>${r.sleeve}</td></tr>`).join(""); }
+function renderKids(){ $("tableBodyKid").innerHTML = KIDS.map(r=>`<tr><td><b>${r.code}</b></td><td>${r.w[0]}–${r.w[1]}</td><td>${r.age}</td><td>${r.len}</td><td>${r.chest}</td><td>${r.sleeve}</td></tr>`).join(""); }
+renderMale(); renderFemale(); renderKids();
+
+function parseNum(x){ if(x==null) return NaN; x=String(x).replace(/[^\d,\.\-]/g,"").replace(",", ".").trim(); return Number(x); }
+function inRange(v,[a,b]){ return v>=a && v<=b; }
+function distToRange(v,[a,b]){ if(v<a) return a-v; if(v>b) return v-b; return 0; }
+function width([a,b]){ return Math.max(1e-9, b-a); }
+function clamp(n,min,max){return Math.max(min, Math.min(max,n));}
+
+function toggleTables(){
+  const g = $("gender").value;
+  $("maleTblWrap").classList.toggle("hidden", g!=="male");
+  $("femaleTblWrap").classList.toggle("hidden", g!=="female");
+  $("kidTblWrap").classList.toggle("hidden", g!=="kids");
+  $("kidNote").classList.toggle("hidden", g!=="kids");
+  $("adultSizes").classList.toggle("hidden", g==="kids");
+  $("kidSizes").classList.toggle("hidden", g!=="kids");
+}
+
+const SPORT_ADJ = {football:0,volleyball:0,pickleball:0,training:0,basketball:0.15,baseball:0.15,rugby:0.15,badminton:-0.15,cycling:-0.15,running:-0.15};
+
+function softScore(size, w, h, alpha=0.65, beta=0.35, sportBias=0){
+  const dw = distToRange(w, size.w) / width(size.w);
+  const dh = distToRange(h, size.h) / width(size.h);
+  let s = alpha*dw + beta*dh;
+  s -= sportBias;
+  return s;
+}
+
+function suggestAdult(h,w,table,selector,whoLabel){
+  const err=$("err"), out=$("result");
+  const idxW = table.findIndex(s=> inRange(w,s.w) );
+  const idxH = table.findIndex(s=> inRange(h,s.h) );
+  if(idxW===-1 || idxH===-1){ err.textContent=`Số đo nằm ngoài bảng ${whoLabel}.`; err.style.display="block"; return; }
+
+  const sportBias = SPORT_ADJ[$("sport").value] || 0;
+  let bestIdx=0, bestScore=Infinity;
+  table.forEach((s,i)=>{
+    const score = softScore(s, w, h, 0.65, 0.35, sportBias*(i/table.length - 0.5));
+    if(score < bestScore){ bestScore=score; bestIdx=i; }
+  });
+
+  const diff = idxH - idxW;
+  const absDiff = Math.abs(diff);
+  if(absDiff >= 3){
+    out.style.display="block"; out.innerHTML = `<div class="hint"><b>Chênh lệch ${absDiff} size</b> giữa chiều cao (${table[idxH].code}) và cân nặng (${table[idxW].code}). <b>Vui lòng liên hệ</b> để có size chuẩn nhất.</div>`; return;
+  }
+
+  let pickIdx = bestIdx;
+  let adjustLen = table[idxH].len;
+  let note=`Chấm điểm mềm → size điểm thấp nhất: <b>${table[bestIdx].code}</b> <span class="score">(score=${bestScore.toFixed(3)})</span>. `;
+  if(absDiff===2 && diff>0){
+    note += `Cao–gầy (chênh 2): dài áo theo <b>${table[idxH].code}</b>.`;
+  } else if(diff>0){
+    note += `Cao–gầy: tăng lai theo <b>${table[idxH].code}</b>.`;
+  } else if(diff<0){
+    note += `Thấp–nặng: cắt lai theo <b>${table[idxH].code}</b>.`;
+  } else {
+    note += `Chiều cao & cân nặng cùng nhóm; thiên hướng theo môn: <b>${$("sport").selectedOptions[0].text}</b>.`;
+  }
+
+  const tb = document.querySelector(selector);
+  [...tb.children].forEach(tr=>{ tr.classList.remove("pick","heightRow"); const lc=tr.querySelector(".lenCell"); if(lc) lc.textContent=lc.getAttribute("data-len"); });
+  const pickRow = tb.children[pickIdx], heightRow = tb.children[idxH];
+  if(pickRow){ pickRow.classList.add("pick"); pickRow.scrollIntoView({behavior:"smooth", block:"center"}); }
+  if(heightRow){ heightRow.classList.add("heightRow"); }
+
+  const originalLen = table[pickIdx].len;
+  const delta = Number((adjustLen - originalLen).toFixed(1));
+  const hasAdj = Math.abs(delta) > 0.01;
+  const adjVerb = delta>0 ? "tăng" : "cắt";
+  const adjBadge = hasAdj ? `<span class="adjPill">${adjVerb} ${Math.abs(delta).toFixed(1)}cm</span>` : "";
+
+  const lenCell = pickRow?.querySelector(".lenCell");
+  if(lenCell && hasAdj){ lenCell.innerHTML = `${originalLen} → <small class="new">${adjustLen.toFixed(1)}</small> <b class="diff">${adjVerb} ${Math.abs(delta).toFixed(1)}cm</b>`; }
+
+  const pick = table[pickIdx];
+  out.style.display="block";
+  out.innerHTML = `
+    <div class="flex" style="justify-content:space-between;align-items:center">
+      <div>
+        <div class="hint">Kết quả gợi ý (${whoLabel})</div>
+        <div style="font-size:22px;font-weight:900;margin-top:2px">
+          Size đề xuất: <span class="size-badge">${pick.code}</span> ${adjBadge}
+        </div>
+        <div class="hint" style="margin-top:6px">${note}</div>
+      </div>
+      <div aria-hidden="true" class="size-badge">${pick.code}</div>
+    </div>
+    <div class="subtitle" style="margin-top:12px">Số đo của bạn</div>
+    <ul class="hint" style="margin:6px 0 0 16px;line-height:1.7">
+      <li>Chiều cao: <b>${h.toFixed(1)}cm</b> (size theo chiều cao: <b>${table[idxH].code}</b>)</li>
+      <li>Cân nặng: <b>${w.toFixed(1)}kg</b> (size theo cân nặng: <b>${table[idxW].code}</b>)</li>
+    </ul>`;
+}
+
+function suggestKids(w){
+  const idx = KIDS.findIndex(s=> inRange(w,s.w) );
+  const err=$("err"), out=$("result");
+  if(idx===-1){ err.textContent="Cân nặng nằm ngoài bảng trẻ em."; err.style.display="block"; return; }
+  const tb = document.querySelector("#tableBodyKid"); [...tb.children].forEach(tr=>tr.classList.remove("pick")); tb.children[idx].classList.add("pick");
+  const p = KIDS[idx];
+  out.style.display="block";
+  out.innerHTML = `
+    <div class="hint">Kết quả gợi ý (Trẻ em)</div>
+    <div style="font-size:22px;font-weight:900;margin-top:2px">Size đề xuất: <span class="size-badge">${p.code}</span></div>
+    <ul class="hint" style="margin:10px 0 0 16px;line-height:1.7">
+      <li>Khoảng cân nặng: <b>${p.w[0]}–${p.w[1]}kg</b> • Tuổi tham khảo: <b>${p.age}</b></li>
+      <li>Dài áo: <b>${p.len}cm</b> • Ngang ngực: <b>${p.chest}cm</b> • Dài tay: <b>${p.sleeve}cm</b></li>
+    </ul>`;
+}
+
+function suggestSize(){
+  $("err").style.display="none"; $("err").textContent=""; $("result").style.display="none";
+  const h=parseNum($("height").value), w=parseNum($("weight").value);
+  const g=$("gender").value;
+  if(g==="kids"){
+    if(Number.isNaN(w)){ $("err").textContent="Nhập cân nặng cho trẻ em."; $("err").style.display="block"; return; }
+    suggestKids(w);
+  } else {
+    if(Number.isNaN(h) || Number.isNaN(w)){ $("err").textContent="Nhập đúng chiều cao và cân nặng."; $("err").style.display="block"; return; }
+    if(g==="male"){ suggestAdult(h,w,MALE,"#tableBodyMale","Nam"); }
+    else { suggestAdult(h,w,FEMALE,"#tableBodyFemale","Nữ"); }
+  }
+}
+
+function clearAll(){
+  ["height","weight"].forEach(id=>{$(id).value="";});
+  $("result").style.display="none"; $("err").style.display="none";
+  document.querySelectorAll("tbody tr").forEach(tr=>tr.classList.remove("pick","heightRow"));
+  document.querySelectorAll(".lenCell").forEach(td=>{ td.textContent = td.getAttribute("data-len"); });
+}
+
+toggleTables();
+["height","weight"].forEach(id => { $(id).addEventListener("keydown", e => { if(e.key==="Enter"){ e.preventDefault(); suggestSize(); } }); });
+</script>
+</body>
+</html>
